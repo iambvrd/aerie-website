@@ -865,7 +865,7 @@
         Book Free Audit
         <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="#000" stroke-width="2.5"><path d="M3 8h10M9 4l4 4-4 4" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </a>
-      <a href="/cdn-cgi/l/email-protection#721a171e1e1d321317001b175c111d" class="btn-ghost">Send a Message</a>
+      <a href="mailto:hello@aerie.co" class="btn-ghost">Send a Message</a>
     </div>
   </div>
 </section>
@@ -884,7 +884,7 @@
   </ul>
 </footer>
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+<script>
 /* ── TERMINAL TYPER ── */
 const lines = [
   { type: 'prompt', text: '$ aerie --run audit --client="SMB"' },
@@ -997,8 +997,10 @@ function typeNext() {
   container.scrollTop = container.scrollHeight;
 }
 
-// start after small delay
-setTimeout(typeNext, 800);
+// start only if terminal is visible (hidden on mobile)
+if (container && getComputedStyle(container).display !== "none" && window.innerWidth > 960) {
+  setTimeout(typeNext, 800);
+}
 
 /* ── NAV SCROLL ── */
 const nav = document.getElementById('nav');
