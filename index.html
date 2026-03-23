@@ -911,96 +911,78 @@ const lines = [
 ];
 
 const container = document.getElementById('tw-body');
-let li = 0, ci = 0;
-let domLines = [];
-let cur = null;
 
-function addLine() {
-  const span = document.createElement('span');
-  span.className = 'tw-line';
-  if (cur) cur.remove();
-  container.appendChild(span);
-  domLines.push(span);
-  cur = null;
-  // add blinking cursor to last line
-  cur = document.createElement('span');
-  cur.className = 'cursor-blink';
-  span.appendChild(cur);
-  return span;
-}
+const lines = [
+  { text: '$ aerie --run audit --client="SMB"', color: '#1db954' },
+  { text: 'Connecting to workflow engine...', color: '#4ade80' },
+  { text: 'Scanning operations...', color: '#4ade80' },
+  { text: '', color: '' },
+  { text: '// AUDIT_RESULTS', color: 'rgba(180,200,180,0.4)' },
+  { text: '{', color: '#b8c8d8' },
+  { text: '  "manual_hours_per_week": 18,', color: '#79c0ff' },
+  { text: '  "automatable_tasks": 7,', color: '#79c0ff' },
+  { text: '  "crm_updated_manually": true,', color: '#79c0ff' },
+  { text: '}', color: '#b8c8d8' },
+  { text: '', color: '' },
+  { text: '// RECOMMENDED_AUTOMATIONS', color: 'rgba(180,200,180,0.4)' },
+  { text: '  [LEAD_CAPTURE_TO_CRM]      ready', color: '#a8d5a2' },
+  { text: '  [CONTENT_DRAFT_AI]          ready', color: '#a8d5a2' },
+  { text: '  [WEEKLY_REPORT_GENERATOR]   ready', color: '#a8d5a2' },
+  { text: '', color: '' },
+  { text: 'Est. time saved: 18 hrs/week', color: '#ffd166' },
+  { text: 'ROI timeline: < 30 days', color: '#4ade80' },
+];
 
-function renderLine(line) {
-  const el = addLine();
-  // remove cursor temporarily while typing
-  if (cur) cur.remove();
+let lineIndex = 0;
+let charIndex = 0;
+let currentEl = null;
 
-  let text = '';
-  let cls = 'tw-cmd';
-  switch(line.type) {
-    case 'prompt':  text = line.text; cls = ''; break;
-    case 'ok':      text = line.text; cls = 'tw-ok'; break;
-    case 'warn':    text = line.text; cls = 'tw-warn'; break;
-    case 'comment': text = line.text; cls = 'tw-comment'; break;
-    case 'code':    text = line.text; cls = 'tw-cmd'; break;
-    case 'str':     text = line.text; cls = 'tw-str'; break;
-    case 'blank':   el.innerHTML = '&nbsp;'; li++; setTimeout(typeNext, 60); return;
-    case 'kv': {
-      const kSpan = document.createElement('span');
-      kSpan.className = 'tw-key';
-      kSpan.textContent = line.key + ': ';
-      const vSpan = document.createElement('span');
-      vSpan.className = 'tw-val';
-      vSpan.textContent = line.val + ',';
-      el.appendChild(kSpan);
-      el.appendChild(vSpan);
-      // add cursor back
-      cur = document.createElement('span');
-      cur.className = 'cursor-blink';
-      el.appendChild(cur);
-      li++; setTimeout(typeNext, 80);
-      return;
-    }
-  }
+function tick() {
+  if (!container) return;
 
-  // type character by character
-  const textNode = document.createElement('span');
-  textNode.className = cls;
-  el.appendChild(textNode);
-  cur = document.createElement('span');
-  cur.className = 'cursor-blink';
-  el.appendChild(cur);
-
-  let charIdx = 0;
-  function typeChar() {
-    if (charIdx < text.length) {
-      textNode.textContent += text[charIdx++];
-      setTimeout(typeChar, line.type === 'prompt' ? 45 : 18);
-    } else {
-      li++;
-      setTimeout(typeNext, line.type === 'blank' ? 40 : 120);
-    }
-  }
-  typeChar();
-}
-
-function typeNext() {
-  if (li >= lines.length) {
-    // restart after pause
-    setTimeout(() => {
-      container.innerHTML = '';
-      domLines = []; li = 0; cur = null;
-      typeNext();
-    }, 3000);
+  if (lineIndex >= lines.length) {
+    setTimeout(reset, 2500);
     return;
   }
-  renderLine(lines[li]);
+
+  const line = lines[lineIndex];
+
+  if (charIndex === 0) {
+    currentEl = document.createElement('div');
+    currentEl.style.cssText = 'font-family:Share Tech Mono,monospace;font-size:.75rem;line-height:1.9;color:' + (line.color || '#b8c8d8');
+    container.appendChild(currentEl);
+  }
+
+  if (line.text === '') {
+    lineIndex++;
+    charIndex = 0;
+    setTimeout(tick, 60);
+    return;
+  }
+
+  if (charIndex < line.text.length) {
+    currentEl.textContent = line.text.slice(0, charIndex + 1) + '|';
+    charIndex++;
+    setTimeout(tick, charIndex === line.text.length ? 150 : 22);
+  } else {
+    currentEl.textContent = line.text;
+    lineIndex++;
+    charIndex = 0;
+    setTimeout(tick, 80);
+  }
+
   container.scrollTop = container.scrollHeight;
 }
 
-// start only if terminal is visible (hidden on mobile)
-if (container && getComputedStyle(container).display !== "none" && window.innerWidth > 960) {
-  setTimeout(typeNext, 800);
+function reset() {
+  container.innerHTML = '';
+  lineIndex = 0;
+  charIndex = 0;
+  currentEl = null;
+  setTimeout(tick, 400);
 }
+
+setTimeout(tick, 800);
 
 /* ── NAV SCROLL ── */
 const nav = document.getElementById('nav');
