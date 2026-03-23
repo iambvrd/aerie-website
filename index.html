@@ -886,29 +886,7 @@
 
 <script>
 /* ── TERMINAL TYPER ── */
-const lines = [
-  { type: 'prompt', text: '$ aerie --run audit --client="SMB"' },
-  { type: 'ok',     text: 'Connecting to workflow engine...' },
-  { type: 'ok',     text: 'Scanning operations...' },
-  { type: 'blank' },
-  { type: 'comment',text: '// AUDIT_RESULTS' },
-  { type: 'code',   text: '{' },
-  { type: 'kv',     key: '  "manual_hours_per_week"', val: '18' },
-  { type: 'kv',     key: '  "automatable_tasks"',     val: '7' },
-  { type: 'kv',     key: '  "crm_updated_manually"',  val: 'true' },
-  { type: 'kv',     key: '  "content_drafted_by_hand"',val: 'true' },
-  { type: 'code',   text: '}' },
-  { type: 'blank' },
-  { type: 'comment',text: '// RECOMMENDED_AUTOMATIONS' },
-  { type: 'str',    text: '  [LEAD_CAPTURE_TO_CRM]       → ready' },
-  { type: 'str',    text: '  [CONTENT_DRAFT_AI]           → ready' },
-  { type: 'str',    text: '  [WEEKLY_REPORT_GENERATOR]    → ready' },
-  { type: 'blank' },
-  { type: 'warn',   text: 'Est. time saved: 18 hrs/week' },
-  { type: 'ok',     text: 'ROI timeline: < 30 days' },
-  { type: 'blank' },
-  { type: 'prompt', text: '$ _' },
-];
+
 
 const container = document.getElementById('tw-body');
 
@@ -991,6 +969,11 @@ window.addEventListener('scroll', () => {
 }, { passive: true });
 
 /* ── SCROLL REVEAL ── */
-const io = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting) { e.target.classList.add('in'); io.unob
+const reveals = document.querySelectorAll('.reveal');
+const io = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('in'); });
+}, { threshold: 0.08 });
+reveals.forEach(el => io.observe(el));
+</script>
+</body>
+</html>
